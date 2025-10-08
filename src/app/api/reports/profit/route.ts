@@ -95,7 +95,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Top sản phẩm có lợi nhuận cao (đơn giản hóa)
-    const topProducts = [];
+    const topProducts: Array<{
+      productName: string;
+      revenue: number;
+      cost: number;
+      profit: number;
+      profitMargin: number;
+    }> = [];
 
     // Thống kê tổng quan
     const summary = {
