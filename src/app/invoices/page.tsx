@@ -406,7 +406,7 @@ export default function InvoicesPage() {
               </tr>
             ) : invoices.length === 0 ? (
               <tr>
-                <td className="p-2" colSpan={6} className="text-center py-8 text-gray-500">
+                <td className="p-2 text-center py-8 text-gray-500" colSpan={6}>
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-4xl">🧾</span>
                     <span>Chưa có hóa đơn nào</span>

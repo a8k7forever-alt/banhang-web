@@ -291,7 +291,7 @@ export default function MaterialsPage() {
               </tr>
             ) : materials.length === 0 ? (
               <tr>
-                <td className="p-2" colSpan={8} className="text-center py-8 text-gray-500">
+                <td className="p-2 text-center py-8 text-gray-500" colSpan={8}>
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-4xl">📦</span>
                     <span>Chưa có vật liệu nào</span>

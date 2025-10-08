@@ -401,7 +401,7 @@ export default function PurchasesPage() {
                 </tr>
               ) : purchases.length === 0 ? (
                 <tr>
-                  <td className="p-2" colSpan={7} className="text-center py-8 text-gray-500">
+                  <td className="p-2 text-center py-8 text-gray-500" colSpan={7}>
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📦</span>
                       <span>Chưa có phiếu nhập hàng nào</span>
