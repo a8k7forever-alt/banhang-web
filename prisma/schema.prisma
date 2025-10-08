@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and authorization
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String   // In production, this should be hashed
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("User")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+// Vật liệu nhập vào (Materials)
+model Material {
+  id            String   @id @default(cuid())
+  name          String
+  sku           String?  @unique
+  costCents     Int      @default(0)
+  quantity      Int      @default(0)
+  unit          String   @default("PCS")
+  quantityScale Int      @default(1)
+  description   String?
+  category      String? // Loại vật liệu: nguyên liệu, phụ liệu, bao bì, etc.
+  supplier      String? // Nhà cung cấp chính
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  purchaseItems   PurchaseItem[]
+
+  @@map("Material")
+}
+
+// Sản phẩm bán ra (Products)
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  sku           String?  @unique
+  priceCents    Int
+  costCents     Int      @default(0) // Chi phí sản xuất
+  quantity      Int      @default(0)
+  unit          String   @default("PCS")
+  quantityScale Int      @default(1)
+  description   String?
+  category      String? // Loại sản phẩm
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  invoiceItems InvoiceItem[]
+
+  @@map("Product")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  invoices Invoice[]
+
+  @@map("Customer")
+}
+
+model Invoice {
+  id            String    @id @default(cuid())
+  code          String?   @unique
+  status        String    @default("DRAFT")
+  customerId    String
+  subtotalCents Int
+  discountCents Int       @default(0)
+  taxCents      Int       @default(0)
+  totalCents    Int
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  customer  Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items     InvoiceItem[]
+  cashFlows CashFlow[]
+
+  @@map("Invoice")
+}
+
+model InvoiceItem {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  productId      String
+  quantity       Int
+  unitPriceCents Int
+  lineTotalCents Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@map("InvoiceItem")
+}
+
+model CashFlow {
+  id          String   @id @default(cuid())
+  type        String
+  amountCents Int
+  category    String
+  note        String?
+  occurredAt  DateTime @default(now())
+  invoiceId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@map("CashFlow")
+}
+
+// New models for purchase management
+model Purchase {
+  id            String   @id @default(cuid())
+  code          String?  @unique
+  supplier      String? // Tên nhà cung cấp
+  status        String   @default("DRAFT") // DRAFT, COMPLETED, CANCELLED
+  subtotalCents Int
+  discountCents Int      @default(0)
+  taxCents      Int      @default(0)
+  totalCents    Int
+  notes         String?
+  purchasedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  items PurchaseItem[]
+
+  @@map("Purchase")
+}
+
+model PurchaseItem {
+  id             String   @id @default(cuid())
+  purchaseId     String
+  materialId     String
+  quantity       Int
+  unitCostCents  Int
+  lineTotalCents Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Restrict)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Restrict)
+
+  @@map("PurchaseItem")
+}
+

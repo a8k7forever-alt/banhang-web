@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  invoices  Invoice[]
+
+  @@map("Customer")
+}
+
+model Product {
+  id            String       @id @default(cuid())
+  name          String
+  priceCents    Int
+  quantity      Int          @default(0)
+  unit          String?      @default("PCS")
+  quantityScale Int          @default(1)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  invoiceItems  InvoiceItem[]
+
+  @@map("Product")
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  code          String?       @unique
+  status        String        @default("DRAFT")
+  customerId    String
+  subtotalCents Int
+  discountCents Int           @default(0)
+  taxCents      Int           @default(0)
+  totalCents    Int
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  items         InvoiceItem[]
+  cashFlows     CashFlow[]
+
+  @@map("Invoice")
+}
+
+model InvoiceItem {
+  id           String  @id @default(cuid())
+  invoiceId    String
+  productId    String
+  quantity     Int
+  unitPriceCents Int
+  lineTotalCents Int
+  invoice      Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product      Product @relation(fields: [productId], references: [id])
+
+  @@map("InvoiceItem")
+}
+
+model Material {
+  id            String         @id @default(cuid())
+  name          String
+  priceCents    Int
+  quantity      Int            @default(0)
+  unit          String?        @default("PCS")
+  quantityScale Int            @default(1)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  purchaseItems PurchaseItem[]
+
+  @@map("Material")
+}
+
+model Purchase {
+  id            String         @id @default(cuid())
+  code          String?
+  supplier      String?
+  status        String         @default("PENDING")
+  subtotalCents Int
+  discountCents Int            @default(0)
+  taxCents      Int            @default(0)
+  totalCents    Int
+  notes         String?
+  purchasedAt   DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  items         PurchaseItem[]
+  cashFlows     CashFlow[]
+
+  @@map("Purchase")
+}
+
+model PurchaseItem {
+  id           String   @id @default(cuid())
+  purchaseId   String
+  materialId   String
+  quantity     Int
+  unitPriceCents Int
+  lineTotalCents Int
+  purchase     Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  material     Material @relation(fields: [materialId], references: [id])
+
+  @@map("PurchaseItem")
+}
+
+model CashFlow {
+  id          String    @id @default(cuid())
+  type        String    // "INCOME" hoặc "EXPENSE"
+  amountCents Int
+  category    String
+  note        String?
+  occurredAt  DateTime  @default(now())
+  invoiceId   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  invoice     Invoice?  @relation(fields: [invoiceId], references: [id])
+
+  @@map("CashFlow")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String   // In production, this should be hashed
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("User")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
