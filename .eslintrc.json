@@ -17,6 +17,10 @@
     "src/generated/**/*",
     "node_modules/**/*",
     "**/prisma/**/*",
-    "**/generated/**/*"
+    "**/generated/**/*",
+    "**/*.d.ts",
+    "**/prisma/runtime/**/*",
+    "**/prisma/wasm-compiler-edge.js",
+    "**/prisma/wasm.js"
   ]
 }
