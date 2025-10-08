@@ -62,8 +62,8 @@ export async function PUT(
       });
 
       // Tính tổng tiền mới
-      const totalCents = items.reduce((sum: number, item: any) => 
-        sum + (item.quantity * (item.unitPriceCents || item.priceCents)), 0
+      const totalCents = items.reduce((sum: number, item: { quantity: number; unitPriceCents?: number; priceCents?: number }) => 
+        sum + (item.quantity * (item.unitPriceCents || item.priceCents || 0)), 0
       );
 
       // Cập nhật hóa đơn

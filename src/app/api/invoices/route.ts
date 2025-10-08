@@ -50,11 +50,11 @@ export async function POST(req: NextRequest) {
 			}
 
 			// Tách sản phẩm thường và sản phẩm tạm thời
-			const regularItems = items.filter((i: any) => i.productId && !i.product);
-			const tempItems = items.filter((i: any) => !i.productId && i.product);
+			const regularItems = items.filter((i: { productId?: string; product?: any }) => i.productId && !i.product);
+			const tempItems = items.filter((i: { productId?: string; product?: any }) => !i.productId && i.product);
 			
 			// Xử lý sản phẩm thường
-			const productIds = regularItems.map((i: any) => i.productId);
+			const productIds = regularItems.map((i: { productId: string }) => i.productId);
 			const products = productIds.length > 0 ? await tx.product.findMany({ where: { id: { in: productIds } } }) : [];
 			const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
 		});
 
 		return NextResponse.json(created, { status: 201 });
-	} catch (e: any) {
-		return NextResponse.json({ error: e?.message ?? "failed" }, { status: 400 });
+	} catch (e: unknown) {
+		return NextResponse.json({ error: e instanceof Error ? e.message : "failed" }, { status: 400 });
 	}
 }

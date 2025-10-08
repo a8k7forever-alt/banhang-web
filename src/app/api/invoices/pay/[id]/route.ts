@@ -22,8 +22,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 			return await tx.invoice.findUnique({ where: { id }, include: { items: { include: { product: true } }, customer: true } });
 		});
 		return NextResponse.json(result);
-	} catch (e: any) {
-		return NextResponse.json({ error: e?.message ?? "failed" }, { status: 400 });
+	} catch (e: unknown) {
+		return NextResponse.json({ error: e instanceof Error ? e.message : "failed" }, { status: 400 });
 	}
 }
 

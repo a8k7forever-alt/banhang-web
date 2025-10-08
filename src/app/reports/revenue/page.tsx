@@ -52,7 +52,7 @@ export default function RevenueReportPage() {
         </div>
         <div className="flex flex-col">
           <label className="text-sm">Nhóm theo</label>
-          <select className="border rounded px-3 py-2" value={group} onChange={(e) => setGroup(e.target.value as any)}>
+          <select className="border rounded px-3 py-2" value={group} onChange={(e) => setGroup(e.target.value as "day" | "month")}>
             <option value="day">Ngày</option>
             <option value="month">Tháng</option>
           </select>

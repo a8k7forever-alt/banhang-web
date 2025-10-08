@@ -139,7 +139,7 @@ export default function InvoicesPage() {
     }));
   };
 
-  const updateItem = (index: number, field: string, value: any) => {
+  const updateItem = (index: number, field: string, value: string | number) => {
     setEditFormData(prev => ({
       ...prev,
       items: prev.items.map((item, i) => 

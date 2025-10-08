@@ -29,14 +29,14 @@ export async function GET(req: NextRequest) {
     end.setHours(23, 59, 59, 999);
 
     // Lọc hóa đơn đã thanh toán trong khoảng thời gian
-    const revenueData = invoices.filter((invoice: any) => {
+    const revenueData = invoices.filter((invoice: { status: string; paidAt: string | null; totalCents: number }) => {
       if (invoice.status !== 'PAID' || !invoice.paidAt) return false;
       const paidAt = new Date(invoice.paidAt);
       return paidAt >= start && paidAt <= end;
     });
 
     // Lọc phiếu nhập hàng trong khoảng thời gian
-    const costData = purchases.filter((purchase: any) => {
+    const costData = purchases.filter((purchase: { createdAt: string; totalCents: number }) => {
       const createdAt = new Date(purchase.createdAt);
       return createdAt >= start && createdAt <= end;
     });
@@ -44,10 +44,10 @@ export async function GET(req: NextRequest) {
     console.log("Filtered data:", { revenueCount: revenueData.length, costCount: costData.length });
 
     // Tính tổng doanh thu
-    const totalRevenue = revenueData.reduce((sum: number, invoice: any) => sum + (invoice.totalCents || 0), 0);
+    const totalRevenue = revenueData.reduce((sum: number, invoice: { totalCents: number }) => sum + (invoice.totalCents || 0), 0);
 
     // Tính tổng chi phí
-    const totalCost = costData.reduce((sum: number, purchase: any) => sum + (purchase.totalCents || 0), 0);
+    const totalCost = costData.reduce((sum: number, purchase: { totalCents: number }) => sum + (purchase.totalCents || 0), 0);
 
     // Tính lợi nhuận
     const profit = totalRevenue - totalCost;
@@ -65,19 +65,19 @@ export async function GET(req: NextRequest) {
       monthEnd.setHours(23, 59, 59, 999);
 
       const monthRevenue = revenueData
-        .filter((invoice: any) => {
+        .filter((invoice: { paidAt: string | null; totalCents: number }) => {
           if (!invoice.paidAt) return false;
           const paidAt = new Date(invoice.paidAt);
           return paidAt >= monthStart && paidAt <= monthEnd;
         })
-        .reduce((sum: number, invoice: any) => sum + (invoice.totalCents || 0), 0);
+        .reduce((sum: number, invoice: { totalCents: number }) => sum + (invoice.totalCents || 0), 0);
 
       const monthCost = costData
-        .filter((purchase: any) => {
+        .filter((purchase: { createdAt: string; totalCents: number }) => {
           const createdAt = new Date(purchase.createdAt);
           return createdAt >= monthStart && createdAt <= monthEnd;
         })
-        .reduce((sum: number, purchase: any) => sum + (purchase.totalCents || 0), 0);
+        .reduce((sum: number, purchase: { totalCents: number }) => sum + (purchase.totalCents || 0), 0);
 
       const monthProfit = monthRevenue - monthCost;
       const monthProfitMargin = monthRevenue > 0 ? (monthProfit / monthRevenue) * 100 : 0;
