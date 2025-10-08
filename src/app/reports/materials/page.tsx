@@ -11,6 +11,7 @@ type Material = {
   quantity: number;
   unit?: string;
   quantityScale?: number;
+  description?: string | null;
   category?: string | null;
   supplier?: string | null;
   isActive: boolean;
