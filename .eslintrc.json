@@ -8,11 +8,15 @@
     "@typescript-eslint/no-unnecessary-type-constraint": "off",
     "@typescript-eslint/no-wrapper-object-types": "off",
     "@typescript-eslint/no-unsafe-function-type": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/no-this-alias": "off",
     "react-hooks/exhaustive-deps": "warn",
     "@next/next/no-html-link-for-pages": "warn"
   },
   "ignorePatterns": [
     "src/generated/**/*",
-    "node_modules/**/*"
+    "node_modules/**/*",
+    "**/prisma/**/*",
+    "**/generated/**/*"
   ]
 }
