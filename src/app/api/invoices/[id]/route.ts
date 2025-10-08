@@ -63,7 +63,7 @@ export async function PUT(
 
       // Tính tổng tiền mới
       const totalCents = items.reduce((sum: number, item: any) => 
-        sum + (item.quantity * item.priceCents), 0
+        sum + (item.quantity * (item.unitPriceCents || item.priceCents)), 0
       );
 
       // Cập nhật hóa đơn
@@ -83,7 +83,8 @@ export async function PUT(
             invoiceId: id,
             productId: item.productId,
             quantity: item.quantity,
-            priceCents: item.priceCents
+            unitPriceCents: item.unitPriceCents || item.priceCents,
+            lineTotalCents: item.quantity * (item.unitPriceCents || item.priceCents)
           }
         });
 
